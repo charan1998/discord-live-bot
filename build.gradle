@@ -1,6 +1,10 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
+
+mainClassName = "DiscordBotApplication"
 
 group 'com.charan'
 version '1.0-SNAPSHOT'
@@ -13,5 +17,5 @@ repositories {
 dependencies {
     implementation 'net.dv8tion:JDA:4.2.0_175'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: '2.3.1.RELEASE'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
