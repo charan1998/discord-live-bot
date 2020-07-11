@@ -1,1 +1,1 @@
-worker: java -jar target/discord-live-bot-1.0.jar
+worker: java -jar build/libs/discord-live-bot-1.0-SNAPSHOT-all.jar
