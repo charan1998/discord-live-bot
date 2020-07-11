@@ -1,5 +1,6 @@
 package com.charan.bot;
 
+import com.charan.common.Constants;
 import com.charan.listeners.CommandListener;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -17,7 +18,7 @@ public class DiscordLiveBot implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        JDABuilder builder = JDABuilder.createDefault("NzMxMDMwMDQyMzIyNDAzMzU5.XwgKvg.4WWZiynSXoPNB429tISfRh0w0uA");
+        JDABuilder builder = JDABuilder.createDefault(System.getenv(Constants.BOT_TOKEN));
         builder.setActivity(Activity.watching("Hentai"));
         builder.addEventListeners(commandListener);
         builder.build();
