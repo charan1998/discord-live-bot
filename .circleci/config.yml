@@ -40,7 +40,7 @@ jobs:
 
       # run tests!
       - run: gradle test
-      - run: gradle shadow
+      - run: gradle shadowJar
 orbs:
   heroku: circleci/heroku@0.0.10
 workflows:
