@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "discord_streamer")
 public class Streamer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
