@@ -1,4 +1,4 @@
-package com.charan.handlers;
+package com.charan.handlers.command;
 
 import com.charan.models.BotResponse;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,8 @@
 package com.charan.listeners;
 
+import com.charan.handlers.event.StreamEventHandler;
 import com.charan.models.BotResponse;
-import com.charan.parsers.CommandParser;
+import com.charan.interpreters.CommandInterpreter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceStreamEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -17,10 +18,12 @@ public class EventListener extends ListenerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(EventListener.class);
 
-    private final CommandParser commandParser;
+    private final CommandInterpreter commandInterpreter;
+    private final StreamEventHandler streamEventHandler;
 
-    EventListener(CommandParser commandParser) {
-        this.commandParser = commandParser;
+    EventListener(CommandInterpreter commandInterpreter, StreamEventHandler streamEventHandler) {
+        this.commandInterpreter = commandInterpreter;
+        this.streamEventHandler = streamEventHandler;
     }
 
     @Override
@@ -31,16 +34,16 @@ public class EventListener extends ListenerAdapter {
             return;
         }
 
-        BotResponse response = commandParser.parseCommand(message.getContentRaw());
+        BotResponse response = commandInterpreter.parseCommand(event);
 
         if (response != null) {
-            event.getChannel().sendMessage(response.getMessage()).queue();
+            event.getChannel().sendMessage(message.getAuthor().getAsMention() + " " + response.getMessage()).queue();
         }
     }
 
     @Override
     public void onGuildVoiceStream(@Nonnull GuildVoiceStreamEvent event) {
-        log.info(event.isStream() + " | " + event.getMember().getEffectiveName() + " | " + event.getVoiceState().getChannel());
+        streamEventHandler.handleEvent(event);
     }
 
 }
