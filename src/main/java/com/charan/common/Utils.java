@@ -39,4 +39,8 @@ public class Utils {
             return matchedMembers.get(0).getId();
         }
     }
+    
+    public static String getUsername(Member member) {
+        return member.getNickname() == null ? member.getUser().getName() : member.getNickname();
+    }
 }

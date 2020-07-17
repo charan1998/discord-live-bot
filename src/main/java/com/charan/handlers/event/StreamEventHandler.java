@@ -1,5 +1,6 @@
 package com.charan.handlers.event;
 
+import com.charan.common.Utils;
 import com.charan.entities.Streamer;
 import com.charan.services.StreamerService;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,7 +22,7 @@ public class StreamEventHandler {
     public void handleEvent(GuildVoiceStreamEvent event) {
         if (event.isStream()) {
             String streamerDiscordId = event.getMember().getId();
-            String streamerName = event.getMember().getUser().getName();
+            String streamerName = Utils.getUsername(event.getMember());
             String guildId = event.getGuild().getId();
             String guildName = event.getGuild().getName();
             String channelName = Objects.requireNonNull(event.getVoiceState().getChannel()).getName();
@@ -31,10 +32,8 @@ public class StreamEventHandler {
             Guild guild = event.getGuild();
             streamer.ifPresent(value -> value.getSubscribers().forEach((subscriber) -> {
                 User user = Objects.requireNonNull(guild.getMemberById(subscriber.getDiscordId())).getUser();
-                user.openPrivateChannel().queue((channel) -> {
-                    channel.sendMessage(streamerName + " is live on " + guildName + "(" + channelName + ")")
-                            .queue();
-                });
+                user.openPrivateChannel().queue((channel) -> channel.sendMessage(streamerName + " is live on " + guildName + "(" + channelName + ")")
+                        .queue());
             }));
         }
     }
