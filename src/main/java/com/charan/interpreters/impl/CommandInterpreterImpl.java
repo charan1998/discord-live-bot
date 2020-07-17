@@ -2,6 +2,10 @@ package com.charan.interpreters.impl;
 
 import com.charan.common.ApplicationContextProvider;
 import com.charan.common.Constants;
+import com.charan.common.Utils;
+import com.charan.exceptions.MultipleMentionsException;
+import com.charan.exceptions.MultipleUsersException;
+import com.charan.exceptions.UsernameNotFoundException;
 import com.charan.handlers.command.CheckCommandHandler;
 import com.charan.handlers.command.NotifyCommandHandler;
 import com.charan.models.BotResponse;
@@ -27,7 +31,7 @@ public class CommandInterpreterImpl implements CommandInterpreter {
 
     @Override
     public BotResponse parseCommand(MessageReceivedEvent event) {
-        String command = event.getMessage().getContentRaw();
+        String command = event.getMessage().getContentRaw().toLowerCase();
 
         if (command.equals(Constants.CHECK_COMMAND)) {
             return applicationContextProvider.getContext().getBean(CheckCommandHandler.class).handle(null);
@@ -38,27 +42,10 @@ public class CommandInterpreterImpl implements CommandInterpreter {
             String guildId = event.getGuild().getId();
             String streamerDiscordId;
 
-            if (event.getMessage().getMentionedUsers().size() > 0) {
-                List<Member> mentionedMembers = event.getMessage().getMentionedMembers();
-
-                if (mentionedMembers.size() > 1) {
-                    return new BotResponse(false, "Mention one user at a time");
-                }
-
-                streamerDiscordId = mentionedMembers.get(0).getId();
-            }
-            else {
-                String username = command.substring(Constants.NOTIFY_COMMAND.length() + 1);
-                List<Member> matchedMembers = event.getGuild().getMembersByName(username, true);
-                if (matchedMembers.size() == 0) {
-                    return new BotResponse(false, "Username not found");
-                }
-                else if (matchedMembers.size() > 1) {
-                    return new BotResponse(false, "Username ambiguous. Be more specific");
-                }
-
-                streamerDiscordId = matchedMembers.get(0).getId();
-                logger.info("Nickname: " + matchedMembers.get(0).getNickname());
+            try {
+                streamerDiscordId = Utils.extractStreamerId(event.getGuild(), event.getMessage());
+            } catch (MultipleMentionsException | UsernameNotFoundException | MultipleUsersException e) {
+                return handleException(e);
             }
 
             logger.info("Requester ID: " + requesterDiscordId);
@@ -69,5 +56,21 @@ public class CommandInterpreterImpl implements CommandInterpreter {
                     .handle(new String[]{requesterDiscordId, streamerDiscordId, guildId});
         }
         return null;
+    }
+
+    private BotResponse handleException(Exception exception) {
+        if (exception instanceof MultipleMentionsException) {
+            return new BotResponse(false, "Mention one user at a time");
+        }
+        else if (exception instanceof UsernameNotFoundException) {
+            return new BotResponse(false, "Username not found");
+        }
+        else if (exception instanceof MultipleUsersException) {
+            return new BotResponse(false, "Username ambiguous. Be more specific");
+        }
+        else {
+            exception.printStackTrace();
+            return new BotResponse(false, "Unknown error occurred. Contact the developer");
+        }
     }
 }
