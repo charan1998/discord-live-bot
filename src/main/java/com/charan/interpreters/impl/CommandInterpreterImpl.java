@@ -7,16 +7,14 @@ import com.charan.exceptions.MultipleMentionsException;
 import com.charan.exceptions.MultipleUsersException;
 import com.charan.exceptions.UsernameNotFoundException;
 import com.charan.handlers.command.CheckCommandHandler;
+import com.charan.handlers.command.FollowersCommandHandler;
+import com.charan.handlers.command.FollowingCommandHandler;
 import com.charan.handlers.command.NotifyCommandHandler;
-import com.charan.models.BotResponse;
 import com.charan.interpreters.CommandInterpreter;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class CommandInterpreterImpl implements CommandInterpreter {
@@ -25,18 +23,18 @@ public class CommandInterpreterImpl implements CommandInterpreter {
 
     private final ApplicationContextProvider applicationContextProvider;
 
-    CommandInterpreterImpl(ApplicationContextProvider applicationContextProvider) {
+    public CommandInterpreterImpl(ApplicationContextProvider applicationContextProvider) {
         this.applicationContextProvider = applicationContextProvider;
     }
 
     @Override
-    public BotResponse parseCommand(MessageReceivedEvent event) {
-        String command = event.getMessage().getContentRaw().toLowerCase();
+    public String parseCommand(MessageReceivedEvent event) {
+        String command = event.getMessage().getContentRaw().toLowerCase().split(" ")[0];
 
         if (command.equals(Constants.CHECK_COMMAND)) {
             return applicationContextProvider.getContext().getBean(CheckCommandHandler.class).handle(null);
         }
-        else if (command.startsWith(Constants.NOTIFY_COMMAND)) {
+        else if (command.equals(Constants.FOLLOW_COMMAND)) {
 
             String requesterDiscordId = event.getAuthor().getId();
             String guildId = event.getGuild().getId();
@@ -55,22 +53,30 @@ public class CommandInterpreterImpl implements CommandInterpreter {
             return applicationContextProvider.getContext().getBean(NotifyCommandHandler.class)
                     .handle(new String[]{requesterDiscordId, streamerDiscordId, guildId});
         }
+        else if (command.equals(Constants.FOLLOWERS_COMMAND)) {
+            return applicationContextProvider.getContext().getBean(FollowersCommandHandler.class)
+                    .handle(new Object[]{event.getAuthor().getId(), event.getGuild()});
+        }
+        else if (command.equals(Constants.FOLLOWING_COMMAND)) {
+            return applicationContextProvider.getContext().getBean(FollowingCommandHandler.class)
+                    .handle(new Object[]{event.getAuthor().getId(), event.getGuild()});
+        }
         return null;
     }
 
-    private BotResponse handleException(Exception exception) {
+    private String handleException(Exception exception) {
         if (exception instanceof MultipleMentionsException) {
-            return new BotResponse(false, "Mention one user at a time");
+            return "Error: Mention one user at a time";
         }
         else if (exception instanceof UsernameNotFoundException) {
-            return new BotResponse(false, "Username not found");
+            return "Error: Username not found";
         }
         else if (exception instanceof MultipleUsersException) {
-            return new BotResponse(false, "Username ambiguous. Be more specific");
+            return "Error: Username ambiguous. Be more specific";
         }
         else {
             exception.printStackTrace();
-            return new BotResponse(false, "Unknown error occurred. Contact the developer");
+            return "Error: Unknown error occurred. Contact the developer";
         }
     }
 }

@@ -32,7 +32,8 @@ public class StreamEventHandler {
             Guild guild = event.getGuild();
             streamer.ifPresent(value -> value.getSubscribers().forEach((subscriber) -> {
                 User user = Objects.requireNonNull(guild.getMemberById(subscriber.getDiscordId())).getUser();
-                user.openPrivateChannel().queue((channel) -> channel.sendMessage(streamerName + " is live on " + guildName + "(" + channelName + ")")
+                user.openPrivateChannel()
+                        .queue((channel) -> channel.sendMessage("```" + streamerName + " is live on " + guildName + "(" + channelName + ")" + "```")
                         .queue());
             }));
         }

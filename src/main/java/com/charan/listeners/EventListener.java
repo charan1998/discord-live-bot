@@ -1,7 +1,6 @@
 package com.charan.listeners;
 
 import com.charan.handlers.event.StreamEventHandler;
-import com.charan.models.BotResponse;
 import com.charan.interpreters.CommandInterpreter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceStreamEvent;
@@ -21,7 +20,7 @@ public class EventListener extends ListenerAdapter {
     private final CommandInterpreter commandInterpreter;
     private final StreamEventHandler streamEventHandler;
 
-    EventListener(CommandInterpreter commandInterpreter, StreamEventHandler streamEventHandler) {
+    public EventListener(CommandInterpreter commandInterpreter, StreamEventHandler streamEventHandler) {
         this.commandInterpreter = commandInterpreter;
         this.streamEventHandler = streamEventHandler;
     }
@@ -34,10 +33,10 @@ public class EventListener extends ListenerAdapter {
             return;
         }
 
-        BotResponse response = commandInterpreter.parseCommand(event);
+        String response = commandInterpreter.parseCommand(event);
 
         if (response != null) {
-            event.getChannel().sendMessage(message.getAuthor().getAsMention() + " " + response.getMessage()).queue();
+            event.getChannel().sendMessage(message.getAuthor().getAsMention() + "```" + response + "```").queue();
         }
     }
 

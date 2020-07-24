@@ -24,7 +24,7 @@ public class Utils {
         }
         else {
             String command = message.getContentRaw();
-            String username = command.substring(Constants.NOTIFY_COMMAND.length() + 1);
+            String username = command.substring(Constants.FOLLOW_COMMAND.length() + 1);
 
             List<Member> matchedMembers = guild.getMembersByNickname(username, true);
             matchedMembers = matchedMembers.size() == 0 ? guild.getMembersByName(username, true) : matchedMembers;

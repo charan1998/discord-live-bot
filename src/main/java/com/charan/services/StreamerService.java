@@ -10,7 +10,7 @@ import java.util.Optional;
 public class StreamerService {
     private final StreamerRepository streamerRepository;
 
-    StreamerService(StreamerRepository streamerRepository) {
+    public StreamerService(StreamerRepository streamerRepository) {
         this.streamerRepository = streamerRepository;
     }
 
