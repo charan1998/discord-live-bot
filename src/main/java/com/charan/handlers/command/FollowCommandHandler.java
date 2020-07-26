@@ -7,11 +7,11 @@ import com.charan.services.UserService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NotifyCommandHandler implements CommandHandler {
+public class FollowCommandHandler implements CommandHandler {
     private final UserService userService;
     private final StreamerService streamerService;
 
-    public NotifyCommandHandler(UserService userService, StreamerService streamerService) {
+    public FollowCommandHandler(UserService userService, StreamerService streamerService) {
         this.userService = userService;
         this.streamerService = streamerService;
     }
@@ -44,6 +44,6 @@ public class NotifyCommandHandler implements CommandHandler {
         requester.getFollowing().add(streamer);
         userService.update(requester);
 
-        return "Your notification request has been added";
+        return "Your follow request has been added";
     }
 }
